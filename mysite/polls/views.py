@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse
+from django.http import Http404
 
 from .models import Question
 
@@ -13,7 +14,12 @@ def index(request):
 	return render(request, 'polls/index.html', context) # with this shortcut, we no longer need to import HttpResponse or loader!
 
 def detail(request, question_id):
-	return HttpResponse("You're looking at question %s" % question_id)
+	# return HttpResponse("You're looking at question %s" % question_id)
+	try:
+		question = Question.objects.get(pk=question_id)
+	except Question.DoesNotExist:
+		raise Http404('Question does not exist')
+	return render(request, 'polls/detail.html', {'question': question}) # context is inside
 
 def results(request, question_id):
 	response = "You're looking at the results of question %s"
