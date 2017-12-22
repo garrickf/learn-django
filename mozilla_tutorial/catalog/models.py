@@ -40,12 +40,19 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-    # Not quite sure yet how reverse works!
+    # Not quite sure yet how reverse works! (Also may need to import reverse)
     def get_absolute_url(self):
         """
         Returns the url to access a particular book instance.
         """
         return reverse('book-detail', args=[str(self.id)])
+
+    def display_genre(self):
+        """
+        Creates a string for the genre, to be displayed in admin
+        """
+        return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
+    display_genre.short_description = 'Genre'
     
 import uuid # Required for unique book instances
 
@@ -74,7 +81,11 @@ class BookInstance(models.Model):
         """
         String for representing the Model object
         """
-        return '%s (%s)' % (self.id,self.book.title)
+        return '%s (%s)' % (self.id, self.book.title)
+
+    # it appears as if we need to declare methods to access deeper attributes for the admin part of the site!
+    def title(self):
+        return self.book.title
         
 class Author(models.Model):
     """
@@ -82,7 +93,8 @@ class Author(models.Model):
     """
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    date_of_birth = models.DateField(null=True, blank=True)
+    # Note how you can specify a short description for the field (for admin)
+    date_of_birth = models.DateField('Born', null=True, blank=True)
     date_of_death = models.DateField('Died', null=True, blank=True)
     
     def get_absolute_url(self):
