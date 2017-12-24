@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 
@@ -46,6 +47,7 @@ class Book(models.Model):
         Returns the url to access a particular book instance.
         """
         return reverse('book-detail', args=[str(self.id)])
+        # SO I THINK: 'book-detail' is the url template, named to go back to. we pass the arg! nice!
 
     def display_genre(self):
         """

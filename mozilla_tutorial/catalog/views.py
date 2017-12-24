@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse # used for debugging
 from .models import Book, BookInstance, Author, Language, Genre # models
+from django.views import generic
 
 # Create your views here.
 # GF: a view takes a request object and any extra params pulled from the url 
@@ -35,3 +36,30 @@ def index(request):
     )
 
     # return HttpResponse('<p>Hello, world!</p>') # DEBUG LINE
+
+class BookListView(generic.ListView):
+    model = Book
+    paginate_by = 2
+    # can overrride get context data or get queryset to change the context passed to the view, or change the query
+
+class BookDetailView(generic.DetailView):
+    model = Book
+
+class AuthorListView(generic.ListView):
+    model = Author
+
+class AuthorDetailView(generic.DetailView):
+    model = Author
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first
+        context = super(AuthorDetailView, self).get_context_data(**kwargs)
+
+        # Put in some extra info. The args passed in are in the kwargs variable. (HTTP params are in the self.request.GET.)
+        # print('pk:', self.kwargs['pk']) # DEBUG LINE
+
+        # Lookups can span relationships (like table joins) using double underscores that follow the relationships. pk or id seem to be OK!
+        books_by_author = Book.objects.filter(author__pk=self.kwargs['pk'])
+        # print(books_by_author) # DEBUG LINE
+        context['books_by_author'] = books_by_author
+        return context
