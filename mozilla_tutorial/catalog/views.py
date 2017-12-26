@@ -23,6 +23,10 @@ def index(request):
     num_genres = Genre.objects.count()
     num_books_containing_pastoralia = Book.objects.filter(title__icontains="pAstoralia").count()
 
+    # Sessions: get number of visits to this view
+    num_visits = request.session.get('num_visits', 0)
+    request.session['num_visits'] = num_visits + 1
+
     # Render the HTML template index.html with the data in the context variable
     return render(
         request,
@@ -32,7 +36,8 @@ def index(request):
         'num_instances_available':num_instances_available,
         'num_authors':num_authors, 
         'num_genres':num_genres,
-        'num_books_containing_pastoralia':num_books_containing_pastoralia},
+        'num_books_containing_pastoralia':num_books_containing_pastoralia,
+        'num_visits':num_visits},
     )
 
     # return HttpResponse('<p>Hello, world!</p>') # DEBUG LINE
